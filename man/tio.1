@@ -1,0 +1,144 @@
+.TH "tio" "1" "June 2018"
+
+.SH "NAME"
+tio \- a simple TTY terminal I/O application
+
+.SH "SYNOPSIS"
+.PP
+.B tio
+.RI "[" <options> "] " "<tty-device>"
+
+.SH "DESCRIPTION"
+.PP
+.B tio
+is a simple TTY terminal application which features a straightforward
+commandline interface to easily connect to TTY devices for basic input/output.
+
+.SH "OPTIONS"
+
+.TP
+.BR \-b ", " "\-\-baudrate " \fI<bps>
+
+Set baud rate [bps] (default: 115200).
+.TP
+.BR \-d ", " "\-\-databits 5" | 6 | 7 | 8
+
+Set data bits (default: 8).
+.TP
+.BR \-f ", " "\-\-flow hard" | soft | none
+
+Set flow control (default: none).
+.TP
+.BR \-s ", " "\-\-stopbits 1" | 2
+
+Set stop bits (default: 1).
+.TP
+.BR \-p ", " "\-\-parity odd" | even | none
+
+Set parity (default: none).
+.TP
+.BR \-o ", " "\-\-output\-delay " \fI<ms>
+
+Set output delay [ms] inserted between each sent character (default: 0).
+.TP
+.BR \-n ", " \-\-no\-autoconnect
+
+Disable automatic connect.
+
+By default tio automatically connects to the provided device if present. If the device is not present, it will wait for it to appear and then connect. If the connection is lost (eg. device disconnects), it will wait for the device to reappear and then reconnect.
+
+However, if the
+.B \-\-no\-autoconnect
+option is provided, tio will exit if the device is not present or an established connection is lost.
+
+.TP
+.BR \-e ", " "\-\-local\-echo
+
+Enable local echo.
+
+.TP
+.BR \-l ", " "\-\-log " \fI<filename>
+
+Log to file.
+
+.TP
+.BR \-m ", " "\-\-map " \fI<flags>
+
+Map (replace, translate) special characters on input or output. The following mapping flags are supported:
+
+.RS
+.TP 12n
+.IP "\fBICRNL"
+Map CR to NL on input (unless IGNCR is set).
+.IP "\fBIGNCR"
+Ignore CR on input.
+.IP "\fBINLCR"
+Map NL to CR on input.
+.IP "\fBINLCRNL"
+Map NL to CR-NL on input.
+.IP "\fBOCRNL"
+Map CR to NL on output.
+.IP "\fBODELBS"
+Map DEL to BS on output.
+.IP "\fBONLCRNL"
+Map NL to CR-NL on output.
+.P
+If defining more than one flag, the flags must be comma separated.
+.RE
+
+.TP
+.BR \-v ", " \-\-version
+
+Display program version.
+.TP
+.BR \-h ", " \-\-help
+
+Display help.
+
+.SH "KEYS"
+.PP
+.TP 16n
+In session, the following key sequences are intercepted as tio commands:
+.IP "\fBctrl-t ?"
+List available key commands
+.IP "\fBctrl-t b"
+Send serial break (triggers SysRq on Linux, etc.)
+.IP "\fBctrl-t c"
+Show configuration (baudrate, databits, etc.)
+.IP "\fBctrl-t e"
+Toggle local echo mode
+.IP "\fBctrl-t h"
+Toggle hexadecimal mode
+.IP "\fBctrl-t l"
+Clear screen
+.IP "\fBctrl-t q"
+Quit
+.IP "\fBctrl-t s"
+Show TX/RX statistics
+.IP "\fBctrl-t t"
+Send ctrl-t key code
+
+.SH "EXAMPLES"
+.TP
+Typical use is without options. For example:
+
+tio /dev/ttyUSB0
+.TP
+Which corresponds to the commonly used options:
+
+tio \-b 115200 \-d 8 \-f none \-s 1 \-p none /dev/ttyUSB0
+.TP
+It is recommended to connect serial tty devices by ID. For example:
+
+tio /dev/serial/by\-id/usb\-FTDI_TTL232R-3V3_FTGQVXBL\-if00\-port0
+.PP
+Using serial devices by ID ensures that tio automatically reconnects to the
+correct serial device if the device is disconnected and then reconnected.
+
+.SH "WEBSITE"
+.PP
+Visit https://tio.github.io
+
+.SH "AUTHOR"
+.PP
+Written by Martin Lund <martin.lund@keep\-it\-simple.com>.

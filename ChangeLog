@@ -1,0 +1,662 @@
+
+=== tio v1.32 ===
+
+
+
+Changes since tio v1.31:
+
+ * Update AUTHORS
+
+ * Minor code style cleanups
+
+ * Cleanup print macros
+
+ * Flush output
+
+   Make sure output is transmitted immediately by flushing the output.
+
+Robey Pointer:
+
+ * add optional timestamps
+
+   with "-t" or "C-t T", toggle a timestamp prefix to each line.
+
+Jakub Wilk:
+
+ * Fix typos
+
+Sylvain Lafrasse:
+
+ * Added macOS compatibility
+
+ * Made O_NONBLOCK flag to open() call specific to macOS only.
+
+ * Added macOS-related details.
+
+ * Added O_NONBLOCK flag to open() call for macOS (10.13.6) compatibility.
+
+
+
+Changes since tio v1.30:
+
+ * Update date
+
+ * Update AUTHORS
+
+Henner Zeller:
+
+ * Clarify the input/output variable names (No-op change)
+
+ * Organize options the same sequence they are mentioned in cmdline help.
+
+ * Update README.
+
+ * Map CR->NL locally on output instead of using tio.c_oflag |= OCRNL.
+
+   This mostly is intended to have local echo output exactly what is sent
+   to the remote endpoint.
+   A nice side-effect is, that it also fixes tty-implementations, that can't
+   deal with the OCRNL flag on tio.c_oflag.
+
+ * Provide local-echo option.
+
+   Can be switched on with -e on the command line.
+   Can be toggled with Ctrl t e while program is running.
+
+ * Write to logfile as soon as we have the data, don't buffer.
+
+   Logfiles are important to see what happened, in particular if something
+   unexpected happened; so we want to make sure that the logfile is flushed
+   to disk.
+
+   Before this change, the logfile was typically written at the end in
+   a large chunk as the default (large) buffering applied. Now, characters are
+   written out ASAP, so it is possible to get a live-view with a
+   tail -f <logfile>
+
+
+
+Changes since tio v1.29:
+
+ * Update README
+
+ * Update man page and bash completion
+
+ * Update AUTHORS
+
+qianfan Zhao:
+
+ * ONLCRNL: change the method to map NL to CR-NL
+
+
+
+Changes since tio v1.28:
+
+ * Add mapping flags INLCRNL and ODELBS
+
+   The following new mapping flags are added:
+
+   INLCRNL: Map NL to CR-NL on input.
+   ODELBS: Map DEL to BS on output.
+
+   Flags requested and tested by Jan Ciger (janoc).
+
+
+
+Changes since tio v1.27:
+
+ * Update README
+
+ * Update AUTHORS
+
+ * Add snap status to README.md
+
+ * Add README.md to prettify GitHub page
+
+ * Add missing header
+
+Petr Vaněk:
+
+ * Add missing header file under musl-libc
+
+   Musl's inclusion tree slightly differs from glibc, therefore TCGETS2 is
+   not reachable through sys/ioctl.h, so asm/ioctls.h needs to be included
+   too.
+
+Jakub Wilk:
+
+ * Fix grammar and typos
+
+
+
+Changes since tio v1.26:
+
+ * Update man page
+
+ * Add support for setting non-standard baudrates
+
+   Support for non-standard baudrate settings will be automatically enabled
+   if the termios2 interface is detected available. However, to play it
+   safe, the old and widely supported termios interface will still be used
+   when setting standard baudrates.
+
+ * Cleanup
+
+ * Update AUTHORS
+
+
+
+Changes since tio v1.25:
+
+ * Reconfigure stdin
+
+   Make stdin behave more raw'ish. In particular, don't
+   translate CR -> NL on input.
+
+ * Add special character map feature
+
+   Add a --map option which allows mapping special characters, in particular CR and
+   NL characters which are used in various combinations on various platforms.
+
+ * Cleanup
+
+ * Update AUTHORS
+
+ * Update README
+
+ * Mention website
+
+ * Update man page
+
+
+
+Changes since tio v1.24:
+
+ * Fix error applying new stdout settings
+
+   On Fedora 26 tio will quit with the following error message:
+
+   "Error: Could not apply new stdout settings (Invalid argument)"
+
+   In case of Fedora, it turns out that the new stdout settings used are a
+   bit too aggressive because an empty termios structure is used. To remedy
+   this we reuse the existing stdout settings and only reconfigure the
+   specific options we need to make a "raw" stdout configuration.
+
+ * Remove unused pkgconfig in configure
+
+ * Code cleanup
+
+   Remove unused variable.
+
+
+
+Changes since tio v1.23:
+
+ * Optimize clear screen command
+
+   Replaced system call with inline ANSI/VT100 clear screen code sequence
+
+ * Fix bash completion installation
+
+   Fixed the configure script to avoid that the bash completion script gets
+   installed outside of the prefix location. The default install location
+   is now $prefix/share/bash-completion/completions.
+
+   Use the configure option '--with-bash-completion-dir=PATH' if you need
+   to install the bash completion script elsewhere.
+
+Jakub Wilk:
+
+ * Add missing commas in conditional sentences
+
+
+
+Changes since tio v1.22:
+
+ * Update copyright headers
+
+Jakub Wilk:
+
+ * Fix typos
+
+
+
+Changes since tio v1.21:
+
+ * Update man page date
+
+ * Update copyright year
+
+ * Code cleanup
+
+ * Update README and man page
+
+
+
+Changes since tio v1.20:
+
+ * Add support for hexadecimal mode
+
+   A new key command 'ctrl-t h' is introduced which toggles between
+   hexadecimal mode and normal mode. When in hexadecimal mode data received
+   will be printed in hexadecimal.
+
+ * Do not distribute src/bash_completion/tio
+
+   Since the bash completion tio script is now autogenerated from tio.in it
+   should not be distributed in the tarball.
+
+ * Add missing forward flag
+
+ * Update AUTHORS file
+
+Adam Borowski:
+
+ * 'ctrl-t b' to send serial break.
+
+Jakub Wilk:
+
+ * Removed git commit references from ChangeLog
+
+   ChangeLog is primary useful for users who don't have the git repository
+   at hand.
+
+   Replace git commit references with version numbers; or if the change
+   only cleans up another change with no release in between, remove the
+   changelog item completely.
+
+
+
+Changes since tio v1.19:
+
+ * Added more error handling of terminal calls
+
+   Also removed duplicate terminal flushing calls.
+
+ * Revert "Added support for non-standard baud rates"
+
+   This reverts a change made in v1.18.
+
+   Reverting because supporting non-standard or arbitrary baud rates is
+   troublesome because the c library provides no means of doing so and even
+   if bare metal linux kernel interface is used it will not work on all
+   Linux kernels version.
+
+
+
+Changes since tio v1.18:
+
+ * Rearranged key commands
+
+   Rearranged the key commands:
+
+   ctrl-t c (clear screen) is now
+   ctrl-t l which is similar to the well known shell ctrl-l
+
+   ctrl-t i (show settings information) is now
+   ctrl-t c (show configuration)
+
+   Updated man page accordingly.
+
+ * Added "ctrl-t c" key command to clear screen
+
+
+
+Changes since tio v1.17:
+
+ * Updated man page
+
+ * Added support for non-standard baud rates
+
+   Only enabled when possible, that is, when the BOTHER definition is
+   available.
+
+   It is untested but it should work as described here:
+   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=683826
+
+   Some Cypress USB<->serial devices supposedly supports arbitrary speeds.
+
+ * Generate baudrate switch cases based on detection
+
+   Support a single source of baud rate configuration as discussed in
+   https://github.com/tio/tio/issues/45 .
+
+   To do so, autogeneration of the switch cases which do the baud rate
+   option value check and configuration/conversion in tty_configure() is
+   introduced via a single macro.
+
+   Just to be safe, this change also enables configure detection of all
+   baud rates, including the ones previously assumed supported by most/all
+   systems (POSIX).
+
+ * Minor cleanup
+
+ * Exit when not a tty device in autoconnect mode
+
+Jakub Wilk:
+
+ * Added non-standard baud rates that are defined on FreeBSD
+
+ * Capitalized "GitHub" in README
+
+
+
+Changes since tio v1.16:
+
+ * Compacted tty_configure() a bit
+
+ * Fixed automatic baud rate enablement
+
+ * Minor cleanups
+
+ * Added autodetection of available baud rates
+
+   Various platforms support different baud rates.
+
+   To avoid adding platform specific handling generic baud rate detection
+   tests are introduced in the configure script. Successfully detected baud
+   rates are automatically enabled. This applies to both the C code and the
+   bash completion script.
+
+   Note:
+   Baud rates below 57600 are defined by POSIX-1 and supported by most
+   platforms so only baud rate 57600 and above are tested.
+
+ * Updated bash-completion
+
+ * Fixed printf() format type
+
+ * Added Travis build configuration
+
+Jakub Wilk:
+
+ * Generated bash completion at configure time
+
+ * Reduce code duplication in baud rate detection
+
+ * Add support for baud rates 200 and 1800
+
+ * Fixed baudrate type
+
+
+
+Changes since tio v1.15:
+
+ * Updated man page
+
+ * Updated README
+
+ * Removed obsolete packaging files
+
+ * Removed use of deprecated bzero()
+
+
+
+Changes since tio v1.14:
+
+ * Removed + to remove potential confusion
+
+ * Added input digit checks
+
+ * Fixed license string
+
+ * Introduced tty_configure()
+
+   Moved tty configuration actions to tty_configure() in tty.c. This way
+   options.c is strictly about parsing options nothing else.
+
+ * Function names cleanup
+
+ * Updated AUTHORS file
+
+   Added Nick who created the new tio package for Arch Linux.
+
+ * Fixed tx/rx counters type
+
+Jakob Haufe:
+
+ * Include config.h before standard headers
+
+   Large file support was meant to be enabled in v1.11.
+   This change enables it for real.
+
+
+
+Changes since tio v1.13:
+
+ * Fixed tio_printf macro
+
+ * Fixed launch hints
+
+   Fixed launch hints not being printed in no autoconnect mode.
+
+ * Added 'ctrl-t ?' to list available commands
+
+ * Fixed log mechanism
+
+   To avoid echoing only log what is received from tty device.
+
+ * Improved tio output
+
+   Added titles and indentation to commands output for clearer separation
+   when firing commands repeatedly.
+
+   Also added print of tio version and quit command hint at launch.
+
+ * Cleaned up tio print mechanism
+
+Jakub Wilk:
+
+ * Fixed grammar
+
+   "allow" is a transitive verb, which requires an object,
+   so "allow to <verb>" is ungrammatical.
+
+ * Fixed typo
+
+
+
+Changes since tio v1.12:
+
+ * Fixed some error prints
+
+ * Fixed error printing for no autoconnect mode
+
+   Always print errors but only print silent errors when in no autoconnect
+   mode.
+
+ * Added key command for showing session settings
+
+   A new key command "ctrl-t i" is added to allow the user to display the
+   various session settings information (baudrate, databits, log file, etc.).
+
+   This is useful in case you have a running session but have forgotten
+   what the settings are.
+
+
+
+Changes since tio v1.11:
+
+ * Consolidated command key handling
+
+ * Moved delay mechanism into separate function
+
+ * Retired obsolete usleep()
+
+   Replaced with nanosleep()
+
+ * Added simple tx/rx statistics command (ctrl-t s)
+
+   To display the total number of bytes transmitted/received simply perform the
+   'ctrl-t s' command sequence.
+
+   This feature can be useful when eg. trying to detect non-printable
+   characters.
+
+ * Further simplification of key handling
+
+   Changed so that the "ctrl-t ctrl-t" sequence is now simply "ctrl-t t" to
+   send the ctrl-t key code. This is inspired by screen which does similar
+   to send its command key code (ctrl-a a).
+
+   This change also eases adding new key commands if needed.
+
+   Updated man page accordingly.
+
+ * Cleaned up and simplified key handling
+
+Jakub Wilk:
+
+ * Insert output delay only if something was output
+
+
+
+Changes since tio v1.10:
+
+ * Enabled large file support (LFS)
+
+   Added autotools AC_SYS_LARGEFILE to support 64 bit file size handling.
+
+ * Updated tio title
+
+
+
+Changes since tio v1.9:
+
+ * Introduced lock on device file
+
+   Tio will now test for and obtain an advisory lock on the tty device file
+   to prevent starting multiple sessions on the same tty device.
+
+ * Updated AUTHORS
+
+Jakub Wilk:
+
+ * Treat EOF on stdin as error
+
+
+
+Changes since tio v1.8:
+
+ * Cleanup of error handling
+
+   Introduced consistent way of handling errors and printing error messages.
+
+   Also upgraded some warnings to errors.
+
+ * Updated localtime() error message
+
+ * Cleanup
+
+Jakub Wilk:
+
+ * Fix error handling for select()
+
+   Previously the error handling code for select() was unreachable.
+
+ * Removed unneeded quotes from AM_CFLAGS
+
+ * Expanded tabs
+
+ * Fixed setting "tainted"
+
+   Set "tainted" if and only if any character was read from the device.
+
+   Ctrl-t is no longer sent to the device on exit, so the trick to avoid
+   its echo is not necessary.
+
+   Characters read from stdin don't directly affect output, so they
+   shouldn't enable "tainted".
+
+ * Used \r in color_printf()
+
+   \033[300D is an unusual way to move the cursor back to column 1.
+   Use straightforward \r instead.
+
+ * Added missing \r\n to warning messages
+
+   \n alone is not enough, because the terminal is in raw mode.
+
+
+
+Changes since tio v1.7:
+
+ * Fixed enablement of compiler warnings
+
+ * Fixed log_open() prototype
+
+ * Fixed index error wrt ctrl-t detection
+
+ * Fixed handling of ctrl-t
+
+   Before, when exercising the quit key sequence (ctrl-t + q) the ctrl-t code
+   (0x14) would be sent.
+
+   This is now fixed so that it is not sent.
+
+   However, in case it is needed to send ctrl-t to the device it is possible by
+   simply repeating the ctrl-t.
+
+   Meaning, ctrl-t + ctrl-t = ctrl-t sent to device.
+
+ * Improved error handling
+
+   Fixes a memory leak and avoids aggressive busy looping when problems
+   accessing tty device.
+
+ * Removed redundant log_close() call
+
+ * Enabled compiler warnings
+
+Jakub Wilk:
+
+ * Stopped copying arguments to fixed-size buffers
+
+   Don't needlessly copy command-line arguments into fixed-size buffers.
+
+   Previously the program crashed if an overlong pathname was provided on
+   the command line. Also, some systems (such as GNU Hurd) don't define
+   MAXPATHLEN at all.
+
+ * Added const to log_open() prototype
+
+ * Completed the ^g to ^t transition
+
+   In v1.7 the escape key was changed from ^g to ^t, but some
+   code and comments still referred to the old key.
+
+ * Used HTTPS for tio.github.io
+
+ * Man page beautification
+
+ * Bumped date in man page
+
+ * Improve man page formatting
+
+   Use regular font for metacharacters such as "[]", "," or "|";
+   use italic font for metavariables.
+
+ * Fixed hyphen vs minus vs em-dash confusion in man page
+
+   - prints as hyphen;
+   \- prints as minus sign;
+   \em prints as em-dash.
+
+
+
+Changes since tio v1.6:
+
+ * Changed escape key from ^g to ^t
+
+   After renaming to "tio" it makes sense to change the escape key
+   accordingly. Hence, the new escape key is ^t.
+
+   Meaning, in session, its now ctrl-t + q to quit.
+
+Jakub Wilk:
+
+ * Fixed silly "tio or tio" in man page
+
+ * Fixed typo
+
